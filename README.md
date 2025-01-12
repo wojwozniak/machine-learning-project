@@ -1,1 +1,1 @@
-# machine-learning-project
+# AI Recommender system for anime series
