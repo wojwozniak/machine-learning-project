@@ -7,6 +7,11 @@ import os
 
 # pip install implicit pandas numpy scipy
 
+
+
+#DATA FORMATTING ETC.
+
+
 # get data
 file_path = "../data"
 anime = pd.read_csv(file_path + "/anime.csv")
@@ -32,7 +37,7 @@ user_id_to_index = {
 ratings["anime_idx"] = ratings["anime_id"].map(anime_id_to_index)
 ratings["user_idx"] = ratings["user_id"].map(user_id_to_index)
 
-# drop missing ids again
+# drop missing idx
 ratings = ratings.dropna(subset=["anime_idx", "user_idx"])
 
 """
@@ -40,6 +45,11 @@ ratings = ratings.dropna(subset=["anime_idx", "user_idx"])
 print(ratings['anime_id'].isin(anime_id_to_index.keys()).all())  # should return True
 print(ratings['user_id'].isin(user_id_to_index.keys()).all())   # should return True
 """
+
+
+
+#BUILDING THE MATRIX
+
 
 # create a sparse matrix of user-anime interactions
 interaction_matrix = coo_matrix(
@@ -49,31 +59,30 @@ interaction_matrix = coo_matrix(
 
 # print("Interaction Matrix Shape:", interaction_matrix.shape)
 
+# start with the original sparse matrix
+interaction_matrix_conf =interaction_matrix.copy()
+
+# convert to binary (implicit feedback)
+interaction_matrix_conf.data = np.ones_like(interaction_matrix.data)
+
+# apply confidence weighting
+interaction_matrix_conf.data = 1 + np.log(1 + interaction_matrix.data)
+
+# convert interaction matrix to CSR format
+interaction_matrix_conf_csr = interaction_matrix_conf.tocsr()
+
+
+
 # TRAIN MODEL
+
 
 # limit OpenBLAS threads for performance
 os.environ["OPENBLAS_NUM_THREADS"] = "1"
 
-# convert to implicit format (confidence matrix)
-# adding a confidence weight for the interaction (logarithmic scale)
-
-interaction_matrix_conf = (
-    interaction_matrix.copy()
-)  # start with the original sparse matrix
-
-# Convert to binary (implicit feedback)
-interaction_matrix_conf.data = np.ones_like(interaction_matrix.data)
-
-# Apply confidence weighting
-interaction_matrix_conf.data = 1 + np.log(1 + interaction_matrix.data)
-
-# Convert interaction matrix to CSR format
-interaction_matrix_conf_csr = interaction_matrix_conf.tocsr()
-
-# Initialize the ALS model
+# initialize the ALS model
 als_model = AlternatingLeastSquares(factors=50, regularization=0.01, iterations=15)
 
-# Train the model with proper threading limits
+# train the model with proper threading limits
 with threadpool_limits(limits=1, user_api="blas"):
     als_model.fit(interaction_matrix_conf_csr.T)
 
