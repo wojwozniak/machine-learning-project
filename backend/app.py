@@ -6,8 +6,10 @@ from scipy.sparse import coo_matrix
 import scipy.sparse as sparse
 from threadpoolctl import threadpool_limits
 import os
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 with open("./backend/als_model.pkl", "rb") as f:
     model = pickle.load(f)
@@ -65,6 +67,7 @@ def get_recommendations_for_new_user(rating_list, model, anime_df, anime_id_to_i
 def recommend():
     try:
         data = request.get_json()
+        print(data)
         rating_list = data['ratings']
 
         if not rating_list:
