@@ -31,6 +31,11 @@ The recommender system leverages Matrix Factorization (MF), a machine learning t
 - `model_reworked.py` contains base ALS system code
 - `model.py` contains old version of ALS system code
 - `ModelOverviewAnimeRecSysMLProject.ipynb` goes over ALS model code - from creation and training to a example
+### `svd_model`
+- `model.py` contains SVD system code
+- `modelOverview.ipynb` is overview of SVD model, contains simple math explanation, coded function and some testing
+- `modelTests.py` contains tests on kaggle data
+- `predictions.csv` contains list of data predicted with SVD
 ### `naive_model`
 - `NaiveModelOverview.ipynb` is overview of naive, KNN model
 
@@ -64,5 +69,5 @@ You now have both backend and frontend running.
 ### Authors:
 * 
 * Bartosz Marchewka
-* 
+* Karolina Kępa
 * Wojciech Woźniak
