@@ -13,6 +13,6 @@ Data files are too big to upload on Github. In order to use model:
 
 ### Authors:
 * 
-*
 * Bartosz Marchewka
-*
+* 
+* Wojciech Woźniak
