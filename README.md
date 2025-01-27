@@ -67,7 +67,7 @@ You now have both backend and frontend running.
 
 
 ### Authors:
-* 
+* Anna Pierzchała
 * Bartosz Marchewka
 * Karolina Kępa
 * Wojciech Woźniak
