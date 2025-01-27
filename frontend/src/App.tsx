@@ -1,14 +1,13 @@
 import { useState } from "react";
 import Recommend from "./Recommend";
-import { Anime } from './types/Anime';
 import { SelectedAnime } from "./types/SelectedAnime";
 import { Button } from "./components/ui/button";
 
 const App = () => {
-  const [recommends, updateRecommends] = useState<Anime[]>([]);
+  const [recommends, updateRecommends] = useState<any[]>([]);
   const [selectedAnime, setSelectedAnime] = useState<SelectedAnime[]>([]);
   const recommendFunction = async () => {
-    const ratings: [string, number][] = selectedAnime.map((anime) => [anime.anime_id, anime.rating]);
+    const ratings: [number, number][] = selectedAnime.map((anime) => [Number(anime.anime_id), anime.rating]);
 
     console.log("Sent", ratings);
 
@@ -44,11 +43,24 @@ const App = () => {
       ) : (
         <div className="flex flex-col items-center text-white">
           <h2 className="text-xl font-semibold mb-4">Recommendations</h2>
-          <ul className="space-y-2">
-            {recommends.map((recommend, index) => (
-              <li key={index} className="text-lg">{recommend.name}</li>
-            ))}
-          </ul>
+          <table className="min-w-full table-auto border-collapse">
+            <thead>
+              <tr>
+                <th className="px-4 py-2 border">Name</th>
+                <th className="px-4 py-2 border">Rating</th>
+                <th className="px-4 py-2 border">Model Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recommends.map((recommend, index) => (
+                <tr key={index}>
+                  <td className="px-4 py-2 border">{recommend.name}</td>
+                  <td className="px-4 py-2 border">{recommend.rating}</td>
+                  <td className="px-4 py-2 border">{recommend.score.toFixed(3)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
           <Button className="mt-20" onClick={(() => updateRecommends([]))}>Clear</Button>
         </div>
       )}
