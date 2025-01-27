@@ -49,7 +49,7 @@ const Recommend: React.FC<RecommendProps> = ({ recommendFunctionClick, selectedA
     };
 
     return (
-        <div className="h-screen bg-gray-900 text-white">
+        <div className="h-screen w-screen bg-gray-900 text-white">
             <div className="max-w-2xl mx-auto p-6">
                 <div className="relative mb-8">
                     <div className="relative">
