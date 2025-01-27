@@ -133,15 +133,3 @@ def recommend_anime(user_id, model, interaction_matrix, anime_df, n_recommendati
     except Exception as e:
         print(f"Unexpected error: {str(e)}")
         return pd.DataFrame()
-
-
-# Test the recommendations
-test_user_id = 1
-recommendations = recommend_anime(
-    test_user_id, model, interaction_matrix, anime)
-
-if not recommendations.empty:
-    print(f"\nRecommendations for User {test_user_id}:")
-    print(recommendations)
-else:
-    print(f"\nNo recommendations available for User {test_user_id}")
