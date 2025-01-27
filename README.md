@@ -47,6 +47,7 @@ The recommender system leverages Matrix Factorization (MF), a machine learning t
 - run `app.py`
 - open another terminal
 - `cd` into `frontend`
+- `npm i` (only needs to be run once)
 - `npm run dev`
 You now have both backend and frontend running. 
 
