@@ -2,31 +2,44 @@ import pickle
 from flask import Flask, jsonify, request
 import pandas as pd
 import numpy as np
-from scipy.sparse import coo_matrix
-import scipy.sparse as sparse
+from scipy.sparse import coo_matrix, csr_matrix
 from threadpoolctl import threadpool_limits
 import os
 from flask_cors import CORS
+import logging
 
+# Initialize Flask app
 app = Flask(__name__)
 CORS(app)
 
-with open("./backend/als_model.pkl", "rb") as f:
-    model = pickle.load(f)
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-with open("./backend/anime_id_to_index.pkl", "rb") as f:
-    anime_id_to_index = pickle.load(f)
+# Load pre-trained model and mappings
+try:
+    with open("./backend/als_model.pkl", "rb") as f:
+        model = pickle.load(f)
+    with open("./backend/anime_id_to_index.pkl", "rb") as f:
+        anime_id_to_index = pickle.load(f)
+    with open("./backend/user_id_to_index.pkl", "rb") as f:
+        user_id_to_index = pickle.load(f)
+except Exception as e:
+    logger.error(f"Error loading model or mappings: {e}")
+    raise
 
-with open("./backend/user_id_to_index.pkl", "rb") as f:
-    user_id_to_index = pickle.load(f)
-
+# Load anime data
 anime = pd.read_csv("./data/anime.csv")
 
+# Create reverse mapping for anime IDs
 index_to_anime_id = {idx: anime_id for anime_id,
                      idx in anime_id_to_index.items()}
 
 
 def get_recommendations_for_new_user(rating_list, model, anime_df, anime_id_to_index, n_recommendations=10):
+    """
+    Generate recommendations for a new user based on their ratings.
+    """
     n_items = len(anime_id_to_index)
     data = []
     cols = []
@@ -36,8 +49,10 @@ def get_recommendations_for_new_user(rating_list, model, anime_df, anime_id_to_i
             idx = anime_id_to_index[anime_id]
             data.append(1 + np.log1p(rating))
             cols.append(idx)
+        else:
+            logger.warning(f"Anime ID {anime_id} not found in mappings.")
 
-    new_user_ratings = sparse.csr_matrix(
+    new_user_ratings = csr_matrix(
         (data, (np.zeros_like(cols), cols)),
         shape=(1, n_items)
     )
@@ -65,16 +80,22 @@ def get_recommendations_for_new_user(rating_list, model, anime_df, anime_id_to_i
 
 @app.route('/recommendations', methods=['POST'])
 def recommend():
+    """
+    Endpoint to get anime recommendations based on user ratings.
+    Expects a JSON payload with a 'ratings' key containing a list of (anime_id, rating) tuples.
+    """
     try:
         data = request.get_json()
-        print(data)
-        rating_list = data['ratings']
+        logger.info(f"Received data: {data}")
 
-        if not rating_list:
+        if not data or 'ratings' not in data:
             return jsonify({"error": "No ratings provided"}), 400
 
-        anime_tuples = data.get('animeTuples', [])
-        print('Received anime tuples:', anime_tuples)
+        rating_list = data['ratings']
+
+        # Validate ratings
+        if not isinstance(rating_list, list) or not all(isinstance(r, (list, tuple)) and len(r) == 2 for r in rating_list):
+            return jsonify({"error": "Invalid ratings format. Expected a list of (anime_id, rating) tuples."}), 400
 
         recommendations = get_recommendations_for_new_user(
             rating_list, model, anime, anime_id_to_index
@@ -83,6 +104,7 @@ def recommend():
         return jsonify(recommendations.to_dict(orient="records"))
 
     except Exception as e:
+        logger.error(f"Error generating recommendations: {e}")
         return jsonify({"error": str(e)}), 500
 
 
