@@ -90,16 +90,11 @@ def recommend_anime(user_id, model, interaction_matrix, anime_df, n_recommendati
         DataFrame containing recommended anime with their metadata and scores
     """
     try:
-        # Convert user_id to internal user index
         if user_id not in user_id_to_index:
             raise KeyError(f"User ID {user_id} not found in training data")
 
         user_idx = user_id_to_index[user_id]
-
-        # Get user recommendations
         user_items = interaction_matrix[user_idx]
-
-        # Get recommendations
         ids, scores = model.recommend(
             user_idx,
             user_items,
@@ -107,20 +102,13 @@ def recommend_anime(user_id, model, interaction_matrix, anime_df, n_recommendati
             filter_already_liked_items=True,
             recalculate_user=True
         )
-
-        # Map anime indices back to anime_ids
         recommended_anime_ids = [index_to_anime_id[idx] for idx in ids]
-
-        # Get recommended anime details
         recommended_anime = anime_df[anime_df['anime_id'].isin(
             recommended_anime_ids)].copy()
-
-        # Add recommendation scores
         score_dict = dict(zip(recommended_anime_ids, scores))
         recommended_anime['score'] = recommended_anime['anime_id'].map(
             score_dict)
 
-        # Sort by score and select relevant columns
         result = recommended_anime[['name', 'genre', 'type', 'rating', 'score']].sort_values(
             by='score', ascending=False
         )
