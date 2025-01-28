@@ -6,6 +6,7 @@ In this project we analyze various models that can be used for a recommender sys
 ## Models
 
 ### KNN System
+This naive recommendation model leverages the **K-Nearest Neighbors** (**KNN**) algorithm to predict a user's ratings for anime they haven't rated yet. The fundamental idea is to find users who have rated the same anime in a way similar to the target user, and then use their ratings for other anime to make predictions.
 
 ### SVD System
 Singular Value Decomposition decomposes matrix into three components: 𝑈 (user features),  Σ (importance of latent factors), and 𝑉^𝑇 (item features). It captures hidden patterns in user-item interactions by mapping both users and items to a shared latent space, enabling predictions for missing values.
