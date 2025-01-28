@@ -7,7 +7,8 @@ In this project we analyze various models that can be used for a recommender sys
 
 ### KNN System
 
-### xyz System
+### SVD System
+Singular Value Decomposition decomposes matrix into three components: 𝑈 (user features),  Σ (importance of latent factors), and 𝑉^𝑇 (item features). It captures hidden patterns in user-item interactions by mapping both users and items to a shared latent space, enabling predictions for missing values.
 
 ### ALS System
 The recommender system leverages Matrix Factorization (MF), a machine learning technique for modeling relationships in high-dimensional data. Commonly used in recommendation systems and collaborative filtering, MF decomposes a matrix into lower-dimensional matrices whose product approximates the original. This method excels at handling sparse data, such as user-item interactions.
